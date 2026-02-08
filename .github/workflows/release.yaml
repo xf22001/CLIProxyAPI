@@ -32,13 +32,24 @@ jobs:
           else
             echo "FLAGS=" >> $GITHUB_ENV
           fi
+      - name: Update Nightly Tag
+        run: |
+          git tag -f nightly
+          git push -f origin nightly
       - uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
           version: latest
-          args: release --clean ${{ env.FLAGS }}
+          args: release --clean --snapshot
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ env.VERSION }}
+          VERSION: nightly
           COMMIT: ${{ env.COMMIT }}
           BUILD_DATE: ${{ env.BUILD_DATE }}
+      - name: Upload to Nightly Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete nightly --yes || true
+          gh release create nightly --title "Nightly Build" --notes "Automated nightly build from ${{ github.sha }}" || true
+          gh release upload nightly dist/*.tar.gz dist/*.zip --clobber
