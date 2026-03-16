@@ -15,15 +15,12 @@ builds:
     binary: cli-proxy-api
     ldflags:
       - -s -w -X 'main.Version={{.Version}}' -X 'main.Commit={{.ShortCommit}}' -X 'main.BuildDate={{.Date}}'
-
 archives:
   - id: "cli-proxy-api"
-    formats:
-      - tar.gz
+    format: tar.gz
     format_overrides:
       - goos: windows
-        formats:
-          - zip
+        format: zip
     files:
       - LICENSE
       - README.md
@@ -34,7 +31,7 @@ checksum:
   name_template: 'checksums.txt'
 
 snapshot:
-  version_template: "{{ .ShortCommit }}"
+  name_template: "{{ incpatch .Version }}-next"
 
 changelog:
   sort: asc
